@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import static com.example.vinay.bluesample.TrackActivity.found;
+
 public class MediaActivity extends AppCompatActivity {
 MediaPlayer media;
     NotificationManager notificationManager;
@@ -30,7 +32,7 @@ MediaPlayer media;
             public void onClick(DialogInterface dialog, int which) {
                 if(media!=null)media.stop();
 
-                Intent i=new Intent(MediaActivity.this,MainActivity.class);
+                Intent i=new Intent(MediaActivity.this,DiscoveringActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -62,6 +64,13 @@ MediaPlayer media;
 
         });
         al.show();
+        found=0;
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(media!=null)
+            media.stop();
     }
 }

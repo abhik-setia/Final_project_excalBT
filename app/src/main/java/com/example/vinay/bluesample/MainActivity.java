@@ -101,21 +101,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if(event.getAction()==MotionEvent.ACTION_DOWN)x1=event.getX();
-        if(event.getAction()==MotionEvent.ACTION_UP){
-            x2=event.getX();
-        }
-      /*  if(x1>x2)
-        {  Intent i=new Intent(MainActivity.this,TrackActivity.class);
-            startActivity(i);
-        }*/
-        if(x1<x2)
-        {
-            Intent i=new Intent(MainActivity.this,DiscoveringActivity.class);
-            startActivity(i);
-        }
-        return super.onTouchEvent(event);
-    }
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        if(event.getAction()==MotionEvent.ACTION_DOWN)x1=event.getX();
+//        if(event.getAction()==MotionEvent.ACTION_UP){
+//            x2=event.getX();
+//        }
+//      /*  if(x1>x2)
+//        {  Intent i=new Intent(MainActivity.this,TrackActivity.class);
+//            startActivity(i);
+//        }*/
+//        if(x1<x2)
+//        {
+//            Intent i=new Intent(MainActivity.this,DiscoveringActivity.class);
+//            startActivity(i);
+//        }
+//        return super.onTouchEvent(event);
+//    }
 }

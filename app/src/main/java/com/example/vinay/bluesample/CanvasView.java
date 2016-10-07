@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -23,14 +24,14 @@ public class CanvasView extends View {
     private Paint mPaint;
     private float mX, mY;
     private static final float TOLERANCE = 650;
-    int [] arr = new int[20];
-    String [] arrS = null;
+    int  arr;
+    String  arrS = null;
 
 
     public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
         context = c;
-        arr[0]=26;
+        //arr[0]=26;
         // we set a new Path
         mPath = new Path();
         // and we set a new Paint with the desired attributes
@@ -43,13 +44,10 @@ public class CanvasView extends View {
         mPaint.setTextSize(35);
     }
 
-    public void setArr(int [] a, String [] as, int length){
-        arr = new int[length];
-        arrS = new String[length];
-        for(int i = 0; i < length; i++){
-            arr[i] = new Integer(a[i]);
-            arrS[i] = new String(as[i]);
-        }
+    public  void setArr(int a, String as){
+        this.arr=a;
+        this.arrS=as;
+
     }
 
     // override onSizeChanged
@@ -84,14 +82,13 @@ public class CanvasView extends View {
 
         mPaint.setColor(Color.RED);
         mPaint.setStyle(Paint.Style.FILL);
-        if(arr != null){
-            for(int i = 0; i < arr.length; i++){
+        if(arr != 0){
                 double value = 6.28 * Math.random();
-                int x = (int) (ratio * arr[i] * Math.cos(value));
-                int y = (int) (ratio * arr[i] * Math.sin(value));
+                int x = (int) (ratio * arr * Math.cos(value));
+                int y = (int) (ratio * arr * Math.sin(value));
                 canvas.drawCircle(canvas.getWidth()/2 + x, canvas.getHeight()/2 + y, 20, mPaint);
                 //canvas.drawText(arrS[i], canvas.getWidth()/2 + x, canvas.getHeight()/2 + y - 20, mPaint);
-            }
+             //   Log.v("hello",i+"");
         }
     }
     public void clearCanvas() {

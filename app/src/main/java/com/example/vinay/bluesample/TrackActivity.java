@@ -21,6 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class  TrackActivity extends AppCompatActivity {
 int initial;
     EditText ed;
@@ -34,11 +36,14 @@ int initial;
     BroadcastReceiver find;
     MediaPlayer media;
     CanvasView canvas;
-    int []  arr=new int[20];
-    String [] arrS=new String[20];
+    int   arr;
+    String  arrS;
     double init_dist;
-
+    static  int found=0;
+    int rssi;
    // int dist[]={10,66,74,80,84,88};
+//    ArrayList<String> names;
+//    ArrayList<String> rssi_values_devices;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +52,8 @@ int initial;
         b1=(Button)findViewById(R.id.button2);
         b2=(Button)findViewById(R.id.button3);
        //
-       canvas=(CanvasView)findViewById(R.id.signature_canvas);
+        canvas=(CanvasView)findViewById(R.id.signature_canvas);
+
         Intent i=getIntent();
         //Toast.makeText(this, "Intent nhi mila", Toast.LENGTH_SHORT).show();
 
@@ -55,12 +61,11 @@ int initial;
         mydev=i.getExtras().getString("device");
         add=i.getExtras().getString("address");
         init_dist=calculate_distance(initial);
-        Log.e("Initial dist=",""+init_dist);
+        Log.v("Initial dist=",""+init_dist);
+        canvas.setArr(initial,mydev);
+        canvas.invalidate();
         Toast.makeText(this, "Device: "+mydev+"\nAddress: "+add+"\nRssiinitial: "+initial, Toast.LENGTH_SHORT).show();
         adapter=BluetoothAdapter.getDefaultAdapter();
-
-
-
 
         b2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,10 +100,10 @@ int initial;
                 .setNegativeButton("No", null)
                 .show();
     }
-   /* public  void clean(View v)
-    {
-        canvas.clearCanvas();
-    }*/
+//    public  void clean(View v)
+//    {
+//        canvas.clearCanvas();
+//    }
     public void scan_dev(final View v) {
         String e=ed.getText().toString();
         if(initflag==1 && (e.equals("")))
@@ -132,20 +137,25 @@ int initial;
                         if(device!=null){
                             if(device.getAddress().equals(add)){
 
-                                int rssi =intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+                                rssi =intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                                 double curr_dist=calculate_distance(rssi);
-                                Log.e("Current addr=",""+curr_dist);
+                                Log.v("Current addr=",""+curr_dist);
                                Toast.makeText(TrackActivity.this,""+rssi,Toast.LENGTH_SHORT).show();
-                                arr[count]=rssi;
-                                arrS[count]=new String(device.getName());
-                                Log.e("Here :" , "" + rssi);
+
+//                                canvas.setArr(arr,arrS);
+//                                canvas.invalidate();
+
+                                Log.v("Here :" , "" + rssi);
                                // if(Math.abs(rssi)>(Math.abs(initial)+thres)){
                                  if(curr_dist>init_dist+thres){
                                     flag=1;
-                                    Log.e("here",rssi+" "+initial+" "+thres);
+                                    Log.v("here",rssi+" "+initial+" "+thres);
                                   //  Toast.makeText(context,rssi+" "+initial+" "+thres, Toast.LENGTH_SHORT).show();
-                                    media= MediaPlayer.create(TrackActivity.this, R.raw.alert );
-                                    media.start();
+                                     if(found==0){
+                                         media= MediaPlayer.create(TrackActivity.this, R.raw.alert );
+                                         media.start();
+                                         found++;
+                                     }
 
                                 //   Toast.makeText(context, "bja na "+flag, Toast.LENGTH_SHORT).show();
                                     adapter.cancelDiscovery();
@@ -162,15 +172,15 @@ int initial;
 
                     if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
                       //  Toast.makeText(context, "Discovery khataam", Toast.LENGTH_SHORT).show();
-                        Log.e("here","khatam");
+                        Log.v("here","khatam");
 
                           if(flag==1){
                               startActivity(new Intent(TrackActivity.this,MediaActivity.class));
                               finish();
                           }
                        flag=0;
-                       // canvas.setArr(arr,arrS,count);
-
+                        canvas.setArr(rssi,mydev);
+                        canvas.invalidate();
                        scan_dev(v);
                     }
                     if(BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
@@ -188,21 +198,17 @@ int initial;
             filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+
             if (adapter != null) {
                 if (adapter.isDiscovering()) {
                     adapter.cancelDiscovery();
-
                 }
             }
-
 
             registerReceiver(find, filter);
             adapter.startDiscovery();
         }
-
-
     }
-
 
 double calculate_distance(int rssi){
     double txPower = -66 ;//hard coded power value. Usually ranges between -59 to -65

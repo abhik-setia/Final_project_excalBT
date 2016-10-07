@@ -99,6 +99,7 @@ BluetoothAdapter adapter;
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String address=availname.get(position).s2;
                 String name=availname.get(position).s1;
+
                 int rssi=availname.get(position).value;
                 Intent i=new Intent(DiscoveringActivity.this,TrackActivity.class);
                 i.putExtra("address",address);
@@ -114,6 +115,7 @@ BluetoothAdapter adapter;
             @Override
             public void onClick(View v) {
                 refresh.setEnabled(false);
+                availname.clear();
                 Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(i,0);
 
@@ -230,6 +232,8 @@ BluetoothAdapter adapter;
 
     @Override
     protected void onDestroy() {
+        if(find!=null)
+            unregisterReceiver(find);
         adapter.cancelDiscovery();
         super.onDestroy();
     }
