@@ -107,7 +107,7 @@ BluetoothAdapter adapter;
 
                 Toast.makeText(DiscoveringActivity.this, "Starting tracking for "+name+"\ninitial="+rssi, Toast.LENGTH_SHORT).show();
                 startActivity(i);
-                finish();
+                //finish();
             }
         });
         refresh.setOnClickListener(new View.OnClickListener() {

@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     Runnable myRunnable;
     // Splash screen timer
     private static int SPLASH_TIME_OUT = 3000;
+     Animator anim,anim2;
+    View myView,myView2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 // Start your app main activity
                 Intent i = new Intent(MainActivity.this, DiscoveringActivity.class);
                 startActivity(i);
-
+                finish();
                 // close this activity
                // finish();
             }
@@ -63,13 +65,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(myRunnable);
+        stop_my_anim();
 
     }
 
+    public void stop_my_anim(){
+        anim.end();
+        anim2.end();
+        myView.setVisibility(View.GONE);
+        myView2.setVisibility(View.GONE);
+    }
     public void start_my_Animation(){
 
-        final View myView = findViewById(R.id.revealview);
-        final View myView2 = findViewById(R.id.imageView);
+        myView = findViewById(R.id.revealview);
+        myView2 = findViewById(R.id.imageView);
         int cx = myView.getWidth() / 2;
         int cy = myView.getHeight() / 2;
         int cx2 = myView2.getWidth() / 2;
@@ -77,9 +86,9 @@ public class MainActivity extends AppCompatActivity {
 
         int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
         int finalRadius2 = Math.max(myView2.getWidth(), myView2.getHeight());
-        final Animator anim =
-                ViewAnimationUtils.createCircularReveal(myView, cx, cy, 251f, finalRadius-1100);
-        final Animator anim2 = ViewAnimationUtils.createCircularReveal(myView2, cx2, cy2, 250f, finalRadius-1100);
+
+              anim=  ViewAnimationUtils.createCircularReveal(myView, cx, cy, 251f, finalRadius-1100);
+        anim2 = ViewAnimationUtils.createCircularReveal(myView2, cx2, cy2, 250f, finalRadius-1100);
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
         anim2.setInterpolator(new AccelerateDecelerateInterpolator());
         anim.setDuration(2000);
@@ -89,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         anim2.start();
         myView2.setVisibility(View.VISIBLE);
         anim.start();
-
 
     }
 
