@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
@@ -41,16 +42,20 @@ BluetoothAdapter adapter;
     final ArrayList<BluetoothDevice> avail = new ArrayList<>();
 
     final ArrayList<Details> availname=new ArrayList<>();
+    ImageView refresh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovering);
+
         aSwitch=(Switch)findViewById(R.id.switch1);
         vis=(TextView)findViewById(R.id.textView4);
         ptext=(TextView)findViewById(R.id.textView5);
         list=(ListView)findViewById(R.id.list);
         prog=(ProgressBar)findViewById(R.id.progressBar2);
+        refresh=(ImageView)findViewById(R.id.refresh);
         adapter= BluetoothAdapter.getDefaultAdapter();
+
         if(adapter==null){
             Toast.makeText(DiscoveringActivity.this, "Blutooth not supported by your device", Toast.LENGTH_SHORT).show();
         }
@@ -103,6 +108,15 @@ BluetoothAdapter adapter;
                 Toast.makeText(DiscoveringActivity.this, "Starting tracking for "+name+"\ninitial="+rssi, Toast.LENGTH_SHORT).show();
                 startActivity(i);
                 finish();
+            }
+        });
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refresh.setEnabled(false);
+                Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(i,0);
+
             }
         });
     }
@@ -165,6 +179,9 @@ BluetoothAdapter adapter;
                     }
                     if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                         prog.setVisibility(View.INVISIBLE);
+                        refresh.setVisibility(View.VISIBLE);
+                        refresh.setEnabled(true);
+
                         // ArrayAdapter ad = new ArrayAdapter(MainActivity.this, android.R.layout.simple_dropdown_item_1line, avail);
                         // available.setAdapter(ad);
                     }
@@ -214,7 +231,6 @@ BluetoothAdapter adapter;
     @Override
     protected void onDestroy() {
         adapter.cancelDiscovery();
-        unregisterReceiver(find);
         super.onDestroy();
     }
 

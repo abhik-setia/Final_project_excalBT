@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.Canvas;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +34,9 @@ int initial;
     CanvasView canvas;
     int []  arr=new int[20];
     String [] arrS=new String[20];
-    int dist[]={10,66,74,80,84,88};
+    double init_dist;
+
+   // int dist[]={10,66,74,80,84,88};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +52,8 @@ int initial;
         initial=(i.getExtras().getInt("initial"));
         mydev=i.getExtras().getString("device");
         add=i.getExtras().getString("address");
-
+        init_dist=calculate_distance(initial);
+        Log.e("Initial dist=",""+init_dist);
         Toast.makeText(this, "Device: "+mydev+"\nAddress: "+add+"\nRssiinitial: "+initial, Toast.LENGTH_SHORT).show();
         adapter=BluetoothAdapter.getDefaultAdapter();
 
@@ -61,15 +65,17 @@ int initial;
             public void onClick(View v) {
                 if(adapter.isDiscovering())adapter.cancelDiscovery();
                 ed.setEnabled(true);
-                b1.setEnabled(true);
-                initflag=1;
 
+                initflag=1;
+                ed.setText("");
 
               //  if(find!=null)
                  //     unregisterReceiver(find);
 
             }
-        });}
+        });
+
+    }
    /* public  void clean(View v)
     {
         canvas.clearCanvas();
@@ -77,7 +83,7 @@ int initial;
     public void scan_dev(final View v) {
         String e=ed.getText().toString();
         if(initflag==1 && (e.equals("")))
-            Toast.makeText(TrackActivity.this, "threshold daaldo bhyii", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TrackActivity.this, "Re-enter threshold distance", Toast.LENGTH_SHORT).show();
 
         else if(initflag==1 && !e.equals("") ) {
 
@@ -108,11 +114,14 @@ int initial;
                             if(device.getAddress().equals(add)){
 
                                 int rssi =intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+                                double curr_dist=calculate_distance(rssi);
+                                Log.e("Current addr=",""+curr_dist);
                                Toast.makeText(TrackActivity.this,""+rssi,Toast.LENGTH_SHORT).show();
                                 arr[count]=rssi;
                                 arrS[count]=new String(device.getName());
                                 Log.e("Here :" , "" + rssi);
-                                if(Math.abs(rssi)>(Math.abs(initial)+dist[thres])){
+                               // if(Math.abs(rssi)>(Math.abs(initial)+thres)){
+                                 if(curr_dist>init_dist+thres){
                                     flag=1;
                                     Log.e("here",rssi+" "+initial+" "+thres);
                                   //  Toast.makeText(context,rssi+" "+initial+" "+thres, Toast.LENGTH_SHORT).show();
@@ -137,7 +146,7 @@ int initial;
                         Log.e("here","khatam");
 
                           if(flag==1){
-                              startActivity(new Intent(TrackActivity.this,MainActivity.class));
+                              startActivity(new Intent(TrackActivity.this,MediaActivity.class));
                               finish();
                           }
                        flag=0;
@@ -174,8 +183,27 @@ int initial;
 
 
     }
-@Override
+
+
+double calculate_distance(int rssi){
+    double txPower = -66 ;//hard coded power value. Usually ranges between -59 to -65
+
+    if (rssi == 0) {
+        return -1.0;
+    }
+
+    double ratio = rssi*1.0/txPower;
+    if (ratio < 1.0) {
+        return Math.pow(ratio,10);
+    }
+    else {
+        double distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;
+        return distance;
+    }
+}
+    @Override
     protected void onDestroy() {
+        if(find!=null)
         unregisterReceiver(find);
     if(media!=null)media.stop();
         super.onDestroy();
