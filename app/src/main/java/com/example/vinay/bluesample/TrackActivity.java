@@ -142,15 +142,13 @@ int initial;
                                 Log.v("Current addr=",""+curr_dist);
                                Toast.makeText(TrackActivity.this,""+rssi,Toast.LENGTH_SHORT).show();
 
-//                                canvas.setArr(arr,arrS);
-//                                canvas.invalidate();
 
                                 Log.v("Here :" , "" + rssi);
-                               // if(Math.abs(rssi)>(Math.abs(initial)+thres)){
+                               Toast.makeText(context,curr_dist+" "+init_dist+" "+thres, Toast.LENGTH_SHORT).show();
+
                                  if(curr_dist>init_dist+thres){
                                     flag=1;
                                     Log.v("here",rssi+" "+initial+" "+thres);
-                                  //  Toast.makeText(context,rssi+" "+initial+" "+thres, Toast.LENGTH_SHORT).show();
                                      if(found==0){
                                          media= MediaPlayer.create(TrackActivity.this, R.raw.alert );
                                          media.start();
@@ -175,6 +173,7 @@ int initial;
                         Log.v("here","khatam");
 
                           if(flag==1){
+
                               startActivity(new Intent(TrackActivity.this,MediaActivity.class));
                               finish();
                           }
@@ -228,12 +227,25 @@ double calculate_distance(int rssi){
 }
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if(find!=null)
         unregisterReceiver(find);
     if(media!=null)media.stop();
-        super.onDestroy();
 
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(media!=null)media.stop();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(media!=null)media.stop();
+
+    }
 }
 
