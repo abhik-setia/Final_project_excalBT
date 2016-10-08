@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
@@ -35,6 +36,10 @@ public class MediaActivity extends AppCompatActivity {
     Handler vibration_handler;
     Runnable r;
 
+    Boolean noti,alarm,flash,vibrate;
+    SharedPreferences user_shared_pref;
+
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +59,13 @@ public class MediaActivity extends AppCompatActivity {
             }
         });
 
+        user_shared_pref=getSharedPreferences("user_pref",Context.MODE_PRIVATE);
+        noti=user_shared_pref.getBoolean("notification_preference",true);
+        alarm=user_shared_pref.getBoolean("alarm_preference",true);
+        flash=user_shared_pref.getBoolean("flash_preference",true);
+        vibrate=user_shared_pref.getBoolean("vibration_preference",true);
 
+        Log.v("hello",noti+" "+alarm+" "+flash+" "+vibrate);
         //to display a dialog box on pressing a button
         al = builder.create();
         al.setIcon(R.drawable.ic_error_black_24dp);
@@ -70,11 +81,12 @@ public class MediaActivity extends AppCompatActivity {
                 PendingIntent pendingIntent = PendingIntent.getActivity(MediaActivity.this, 1, intent, 0);
 
                 //reqcode- anynumber
-                Notification notification1 = new Notification.Builder(MediaActivity.this).setSmallIcon(R.drawable.logo11).setContentText("Alert : Device out of range")
-                        .setContentTitle("BT Gaurd").setAutoCancel(true)
-                        .setContentIntent(pendingIntent).build();
-                notificationManager.notify(1, notification1);
-
+                if(noti==true) {
+                    Notification notification1 = new Notification.Builder(MediaActivity.this).setSmallIcon(R.drawable.logo11).setContentText("Alert : Device out of range")
+                            .setContentTitle("BT Tracker").setAutoCancel(true)
+                            .setContentIntent(pendingIntent).build();
+                    notificationManager.notify(1, notification1);
+                }
 
             }
 
@@ -90,20 +102,26 @@ public class MediaActivity extends AppCompatActivity {
             }
         });
         found = 0;
+        isTorchOn = false;
+        isVibrationOn=false;
 
+
+
+        if(flash)
         start_flashlight();
-
-        start_vibration();
+        if(vibrate){
+            start_vibration();
+            Log.v("hello","started vibration");
+        }
 
     }
 
     //fire up flashlight
     public void start_flashlight(){
 
-        isTorchOn = false;
         Boolean isFlashAvailable = getApplicationContext().getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-
+    isTorchOn=true;
         if(isFlashAvailable){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
@@ -122,8 +140,8 @@ public class MediaActivity extends AppCompatActivity {
     public void  start_vibration(){
         final Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
-        vibration_handler=new Handler();
         isVibrationOn=true;
+        vibration_handler=new Handler();
         r=new Runnable() {
             @Override
             public void run() {
@@ -162,9 +180,9 @@ public class MediaActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(isTorchOn){
-            turnOffFlashLight();
-        }
+//        if(isTorchOn){
+//            turnOffFlashLight();
+//        }
 //        if(isVibrationOn)
 //            vibration_handler.removeCallbacks(r);
         if (media != null)
@@ -175,9 +193,9 @@ public class MediaActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(isTorchOn){
-            turnOffFlashLight();
-        }
+//        if(isTorchOn){
+//            turnOffFlashLight();
+//        }
 //        if(isVibrationOn)
 //            vibration_handler.removeCallbacks(r);
         if (media != null)
@@ -188,11 +206,11 @@ public class MediaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(isTorchOn){
-            turnOnFlashLight();
-        }
-        if(!isVibrationOn)
-            start_vibration();
+//        if(isTorchOn){
+//            turnOnFlashLight();
+//        }
+//        if(!isVibrationOn)
+//            start_vibration();
 
     }
     @Override
@@ -201,7 +219,7 @@ public class MediaActivity extends AppCompatActivity {
         if (media != null)
             media.stop();
         if(isTorchOn){
-            turnOnFlashLight();
+            turnOffFlashLight();
         }
         if(isVibrationOn)
             vibration_handler.removeCallbacks(r);

@@ -18,6 +18,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -39,6 +42,7 @@ Switch aSwitch;
 BluetoothAdapter adapter;
     ProgressBar prog;
     BroadcastReceiver find;
+    CustomAdapter ad;
     final ArrayList<BluetoothDevice> avail = new ArrayList<>();
 
     final ArrayList<Details> availname=new ArrayList<>();
@@ -116,6 +120,8 @@ BluetoothAdapter adapter;
             public void onClick(View v) {
                 refresh.setEnabled(false);
                 availname.clear();
+                if(ad!=null)
+                ad.notifyDataSetChanged();
                 Intent i=new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(i,0);
 
@@ -190,7 +196,7 @@ BluetoothAdapter adapter;
 
                     if(avail.size()>0){
                         // ArrayAdapter ad = new ArrayAdapter(BlueListActivity.this, android.R.layout.simple_dropdown_item_1line, availname);
-                        CustomAdapter ad=new CustomAdapter(DiscoveringActivity.this,availname);
+                        ad=new CustomAdapter(DiscoveringActivity.this,availname);
                         list.setAdapter(ad);
                     }
                 }
@@ -238,7 +244,27 @@ BluetoothAdapter adapter;
         super.onDestroy();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.user_pref,menu);
+        return  true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId())
+        {
+            case R.id.user_pref:startActivity(new Intent(DiscoveringActivity.this,SettingsActivity.class));
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+
+
+    }
 }
 
 
